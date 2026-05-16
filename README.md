@@ -1,8 +1,8 @@
-# HearthTracker
+# HearthLens
 
 Minimal Hearthstone deck tracker in Qt 6 / C++17. Tails `Power.log` in real time,
 parses zone changes, and shows an always-on-top overlay with cards remaining in
-your deck and cards your opponent has revealed.
+your deck and cards your opponent has revealed. 
 
 ## Build
 
