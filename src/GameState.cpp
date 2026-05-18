@@ -37,6 +37,7 @@ void GameState::onGameEnded()
     m_pendingCompanions.clear();
     m_countedUpgradeEntities.clear();
     m_drawnFromDeckEntities.clear();
+
     m_catchingUp = false;
     qDebug() << "[GameState] Game ended — per-game state reset.";
     emit stateChanged();
@@ -66,6 +67,7 @@ void GameState::onGameCreated()
     m_pendingCompanions.clear();
     m_countedUpgradeEntities.clear();
     m_drawnFromDeckEntities.clear();
+
     m_catchingUp = false;
 
     // NOTE: m_playerDeck and m_deckFormat are intentionally NOT cleared here.
@@ -135,7 +137,6 @@ QHash<QString, int> GameState::opponentHandAges() const
     for (auto it = m_entityHandTurn.constBegin(); it != m_entityHandTurn.constEnd(); ++it) {
         int eid = it.key();
         if (m_entityPlayer.value(eid, -1) == m_localPlayerId) continue;
-        if (m_entityZone.value(eid) != "HAND") continue;
         const QString &cid = m_countedEntities.value(eid);
         if (cid.isEmpty()) continue;
         if (!result.contains(cid) || result[cid] > it.value())
@@ -321,13 +322,14 @@ void GameState::onZoneChanged(int entityId, int playerId, const QString &cardId,
 
     int resolvedPlayer = (playerId != -1) ? playerId : m_entityPlayer.value(entityId, -1);
 
-    if (fromZone == "HAND" && toZone != "HAND")
-        m_entityHandTurn.remove(entityId);
+    // Don't remove from m_entityHandTurn on hand exit — keep it so opponentHandAges()
+    // can still correlate the draw turn with the card ID after it's been revealed.
 
     if (m_localPlayerId != -1 && resolvedPlayer == m_localPlayerId) {
         const QString cid = !cardId.isEmpty() ? cardId : m_countedEntities.value(entityId);
         if (!cid.isEmpty()) {
-            if (toZone == "PLAY" && fromZone == "HAND") {
+            if (toZone == "PLAY" && fromZone == "HAND"
+                    && !m_playerPlayedFromHand.contains(entityId)) {
                 m_playerPlayedFromHand.insert(entityId);
                 if (m_cards->lookup(cid).cost == 1)
                     m_playerOneCostPlayed.append(cid);

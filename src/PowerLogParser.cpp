@@ -3,7 +3,7 @@
 
 PowerLogParser::PowerLogParser(QObject *parent) : QObject(parent)
 {
-    m_rePrefix              = QRegularExpression(R"(^D \d\d:\d\d:\d\d\.\d+ (?:PowerTaskList|GameState)\.DebugPrintPower\(\) - )");
+    m_rePrefix              = QRegularExpression(R"(^D \d\d:\d\d:\d\d\.\d+ (?:PowerTaskList|GameState)\.DebugPrint(?:Power|Game)\(\) - )");
     m_reCreateGame          = QRegularExpression(R"(^\s*CREATE_GAME\s*$)");
     m_reGameOver            = QRegularExpression(R"(TAG_CHANGE\s+Entity=GameEntity\s+tag=STATE\s+value=COMPLETE)");
     m_reFullEntityBracketed = QRegularExpression(R"(FULL_ENTITY\s+-\s+(?:Updating|Creating)\s+\[((?:[^\[\]]*|\[[^\[\]]*\])*)\]\s+CardID=([A-Za-z0-9_]*))");

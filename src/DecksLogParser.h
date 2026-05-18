@@ -27,5 +27,5 @@ private:
     static int readVarint(const QByteArray &data, int &pos);
 
     CardDatabase *m_cards;
-    int m_state = 0; // 0=idle 1=saw trigger 2=saw name 3=saw deckId
+    int m_state = 0; // 0=idle  1=collecting metadata/deckstring after trigger
 };

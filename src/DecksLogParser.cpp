@@ -91,23 +91,18 @@ void DecksLogParser::onLine(const QString &line)
     switch (m_state) {
     case 0:
         break;
-    case 1: // "### Deck Name"
-        m_state = 2;
-        break;
-    case 2: // "# Deck ID: N"
-        m_state = 3;
-        break;
-    case 3: { // deckstring
-        int format = 2; // default Standard
+    case 1: { // look for the deckstring; skip any metadata / name lines
+        int format = 2;
         QHash<QString, int> deck = decodeDeckString(payload, format);
         if (!deck.isEmpty()) {
             qDebug() << "[DecksLogParser] Deck loaded:" << deck.size()
                      << "unique cards, format=" << format;
             emit deckLoaded(deck, format);
-        } else {
-            qWarning() << "[DecksLogParser] Failed to decode deckstring:" << payload.left(40);
+            m_state = 0;
         }
-        m_state = 0;
+        // If decode failed this line isn't the deckstring — stay in state 1
+        // and keep scanning. The "Finding Game With Deck" guard above resets
+        // us to state 1 anyway if a new trigger arrives before we find it.
         break;
     }
     }
