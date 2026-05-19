@@ -277,9 +277,16 @@ void GameState::onCardRevealed(int entityId, int playerId, const QString &cardId
     if (fromZone == "DECK" && toZone == "DECK")
         m_deckOriginEntities.insert(entityId);
 
-    if (!m_countedUpgradeEntities.contains(entityId) &&
+    if (fromZone == "HAND" &&
+        !m_countedUpgradeEntities.contains(entityId) &&
         m_countedEntities.contains(entityId) &&
         (cardId == "MEND_300" || cardId == "MEND_303" || cardId == "MEND_307")) {
+        // fromZone == "HAND" ensures we only trigger on play, not on draw.
+        // onZoneChanged sets m_countedEntities before onCardRevealed fires for
+        // a deck draw, which would otherwise cause a spurious trigger on draw.
+        // Seal immediately so a second reveal of the same entity cannot retrigger.
+        m_countedUpgradeEntities.insert(entityId);
+        m_animalCompanionUpgrades += (cardId == "MEND_307") ? 2 : 1;
         m_pendingCompanions.clear();
         m_collectingCompanions = true;
     }
