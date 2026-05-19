@@ -338,7 +338,14 @@ void GameState::onZoneChanged(int entityId, int playerId, const QString &cardId,
             if (toZone == "PLAY" && fromZone == "HAND"
                     && !m_playerPlayedFromHand.contains(entityId)) {
                 m_playerPlayedFromHand.insert(entityId);
-                if (m_cards->lookup(cid).cost == 1)
+                // Only count for the Confront replay list if this entity was
+                // actually drawn from the player's deck.  When Confront replays
+                // a spell, Hearthstone creates a fresh copy that routes through
+                // HAND → PLAY; that copy is NOT in m_drawnFromDeckEntities, so
+                // it is excluded here to prevent the list from growing
+                // exponentially with each subsequent Confront play.
+                if (m_cards->lookup(cid).cost == 1
+                        && m_drawnFromDeckEntities.contains(entityId))
                     m_playerOneCostPlayed.append(cid);
             }
             if (!m_catchingUp
