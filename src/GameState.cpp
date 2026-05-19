@@ -355,6 +355,12 @@ void GameState::onZoneChanged(int entityId, int playerId, const QString &cardId,
             if (!m_countedUpgradeEntities.contains(entityId)) {
                 m_countedUpgradeEntities.insert(entityId);
                 m_animalCompanionUpgrades += (cid == "MEND_307") ? 2 : 1;
+                // Trigger companion re-detection for this upgrade.
+                // This path fires for both normal hand-plays (via TAG_CHANGE only)
+                // and replayed copies (e.g. Confront the Tol'vir replaying Tame Pet),
+                // which never come from HAND so onCardRevealed won't catch them.
+                m_pendingCompanions.clear();
+                m_collectingCompanions = true;
             }
         }
     }

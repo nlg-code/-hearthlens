@@ -79,19 +79,25 @@ void AnimalCompanionWidget::paintEvent(QPaintEvent *)
         p.fillPath(circle, QColor(15, 35, 15, 210));
     }
 
-    // Upgrade badge — top-right quadrant.
+    // Cost badge — top-right quadrant.
+    // Shows the current mana cost of the Animal Companion pool:
+    // base 3-cost companions + 1 per upgrade (Tame Pet / Migrating Elekk)
+    //                        + 2 per Roam Free, capped at 10.
+    // Minimum displayed is 4 (after the first upgrade); hidden until then.
     if (m_upgrades > 0) {
         p.setClipping(false);
-        const QString label = QString("+%1").arg(m_upgrades);
+        const int cost = qMin(3 + m_upgrades, 10);
+        const QString label = QString::number(cost);
         QFont f;
         f.setBold(true);
         f.setPixelSize(12);
         p.setFont(f);
         QFontMetrics fm(f);
-        int tw = fm.horizontalAdvance(label) + 8;
+        int tw = fm.horizontalAdvance(label) + 10;
         QRect badge(r.right() - tw - 2, r.top() + 2, tw, 18);
-        p.setBrush(QColor(10, 60, 10, 230));
-        p.setPen(QPen(QColor(80, 200, 80), 1));
+        // Blue mana-gem colour to match the mana cost convention.
+        p.setBrush(QColor(10, 30, 120, 230));
+        p.setPen(QPen(QColor(80, 140, 255), 1));
         p.drawRoundedRect(badge, 3, 3);
         p.setPen(Qt::white);
         p.drawText(badge, Qt::AlignCenter, label);
