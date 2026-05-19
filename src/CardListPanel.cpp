@@ -289,13 +289,15 @@ void CardListPanel::populate(const QHash<QString, int> &cards,
             m_handList->setVisible(false);
         }
 
-        // Deck section: badge = deck + hand (total remaining copies).
-        // Grey when total == 0 (all copies drawn AND played/discarded).
+        // Deck section: badge = copies still in deck only.
+        // Hand copies are already shown in the hand section above; including
+        // them here caused every drawn card to appear twice (once in each
+        // section, both with count 1).
+        // Grey when inDeck == 0 (all copies have been drawn into hand or played).
         QHash<QString,int> totalAvailable;
         for (const auto &p : deckCards) {
             int inDeck = remaining.value(p.second, 0);
-            int inHand = hand.value(p.second, 0);
-            totalAvailable[p.second] = inDeck + inHand;
+            totalAvailable[p.second] = inDeck;
         }
 
         fillList(m_deckList, deckCards, totalAvailable, true, {}, deadMinions);
